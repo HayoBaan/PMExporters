@@ -1,0 +1,185 @@
+* {
+    outline: none;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    overflow: hidden;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    font-family: "Helvetica Neue", "Segoe UI", Helvetica, Tahoma, Arial, sans-serif;
+    font-weight: 300;
+    color: #aaa;
+    background: #000;
+}
+
+img {
+    border-style: none;
+}
+
+table {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#title {
+    text-align: center;
+    clear: both;
+    margin: 5px 55px 0 55px;
+    min-height: 3em; /* Setting straight height triggers an IE6 bug */
+    max-height: 3em;
+}
+
+#title h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 165%;
+}    
+
+#title h2 {
+    margin: 0;
+    font-weight: 400;
+    font-size: 85%;
+}
+
+#title h3 {
+    margin: 0;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 60%;
+}
+
+#mainbody {
+    overflow: auto;
+    clear: both;
+    width: 100%;
+}
+
+#mainbody td.thumb {
+    -moz-border-radius: 6px; /* Firefox */
+    -webkit-border-radius: 6px; /* Safari and Chrome */
+    -o-border-radius: 6px; /* Opera */
+    border-radius: 6px;
+}
+
+#mainbody img.thumb {
+    opacity: 0;
+    filter: alpha(opacity=0); /* IE */
+}
+
+#mainbody td {
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#mainbody td img {
+    vertical-align: top;
+}
+
+#mainbody td.thumb {
+    background-color: #444;
+    border: 2px solid #000;
+}
+
+#mainbody td.thumb:hover {
+    background-color: #333;
+    border: 2px solid #eee;
+}
+
+#fullimagebg {
+    background-color: #000;
+    display: none;
+    position: absolute;
+    z-index: 3;
+    left: 0px;
+    bottom: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+#imageleft, #imageright {
+    display: none;
+    position: absolute;
+    z-index: 4;
+    top: 0px;
+}
+
+#imageleft {
+    left: 0px;
+    padding-left: 14px;
+}
+
+#imageright {
+    right: 0px;
+    padding-right: 14px;
+}
+
+#slideshow {
+    position: absolute;
+    z-index: 5;
+    bottom: 22px;
+    left: 0px;
+    padding: 4px 14px 4px 14px;
+}
+
+#fullimage_1, #fullimage_0, #fullimage_2 {
+    text-align: center;
+    display: none;
+    position: absolute;
+    z-index: 4;
+    left: 30px;
+    bottom: 30px;
+    height: 80px;
+    width: 80px;
+    padding: 0;
+    vertical-align: bottom;
+}
+
+#fullimagetitle_1, #fullimagetitle_0, #fullimagetitle_2 {
+    text-align: center;
+    display: none;
+    position: absolute;
+    z-index: 5;
+    opacity: 0.7;
+    filter: alpha(opacity=70); /* IE */
+    left: 0px;
+    top: 40px;
+    width: 80px;
+    background: #222;
+    padding: 14px;
+}
+
+#fullimagetitle_1 h1, #fullimagetitle_0 h1, #fullimagetitle_2 h1 {
+    margin: 0;
+    color: #fff;
+    font-size: 100%;
+}
+
+#fullimagetitle_1 h2, #fullimagetitle_0 h2, #fullimagetitle_2 h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 70%;
+    font-weight: 400;
+    font-style: italic;
+}
+
+@media screen and (max-width: 600px) {
+    #fullimagetitle_1, #fullimagetitle_0, #fullimagetitle_2 {
+        padding: 10px;
+        top: 28px
+    }
+}
+
+@media screen and (max-width: 400px) {
+    #fullimagetitle_1, #fullimagetitle_0, #fullimagetitle_2 {
+        padding: 8px;
+        top: 24px
+    }
+}
