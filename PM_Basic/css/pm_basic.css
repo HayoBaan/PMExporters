@@ -124,9 +124,9 @@ table {
 #slideshow {
     position: absolute;
     z-index: 5;
-    bottom: 22px;
+    bottom: 0px;
     left: 0px;
-    padding: 4px 14px 4px 14px;
+    padding: 7px 14px 7px 14px;
 }
 
 #fullimage_1, #fullimage_0, #fullimage_2 {

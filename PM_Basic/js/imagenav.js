@@ -125,16 +125,18 @@ function createBody() {
         $("img[id^=thumb]").mousedown(noRightClick);
         $("img[id^=thumb]").contextmenu(noContextMenu);
     }
-   
+
+    $("#slideshow").css("padding-left", Math.max(0,($(window).width()-iconsize))/2);
+    $("#slideshow").css("padding-right", Math.max(0,($(window).width()-iconsize))/2);
+    
     // Target sizes for full image
     targetxFull = Math.min(maxxSize, $(window).width() - 2*(iconsize+fullimagespacing+margin));
-    targetyFull = Math.min(maxySize, $(window).height() - 2*(fullimagespacing+margin));
+    targetyFull = Math.min(maxySize, $(window).height() - 2*(iconsize+fullimagespacing+margin/2));
     $("#fullimagebg").css("width", $(window).width() + "px");
     $("#fullimagebg").css("height", $(window).height() + "px");
     $("#fullimagetitle_1").css("width", $(window).width()-2*margin + "px");
     $("#fullimagetitle_0").css("width", $(window).width()-2*margin + "px");
     $("#fullimagetitle_2").css("width", $(window).width()-2*margin + "px");
-    $("#slideshow").css("padding-right", Math.max(0,$(window).width()-iconsize-margin));
 }
 
 // Determine exact size of full image

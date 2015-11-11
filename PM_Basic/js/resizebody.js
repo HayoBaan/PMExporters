@@ -19,6 +19,6 @@ function verticalPos(elem) {
 
 function resizeBody() {
     mainbodyWidth=document.getElementById("mainbody").offsetWidth;
-    mainbodyHeight=Math.max(200,$(window).height()-verticalPos(document.getElementById("mainbody")));
+    mainbodyHeight=verticalPos(document.getElementById("slideshow"))-verticalPos(document.getElementById("mainbody"));
     $("#mainbody").css("height", mainbodyHeight+"px");
 }
