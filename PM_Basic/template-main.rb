@@ -298,7 +298,7 @@ var maxthumbxSize = #{spec.thumb_max_width}; var maxthumbySize = #{spec.thumb_ma
   <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
   <link rel="stylesheet" href="css/pm_basic.css" type="text/css" />
   <link rel="stylesheet" href="css/custom.css" type="text/css" />
-  <meta name="viewport" content="initial-scale=1.0" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
   <meta http-equiv="imagetoolbar" content="no" />
   <title>#{escapeHTML(@bridge.expand_vars(spec.main_title, 1))}</title>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
