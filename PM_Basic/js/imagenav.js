@@ -17,8 +17,13 @@
     maxxSize      <- Maximum image width
     ySizes        <- Image heights
     maxySize      <- Maximum image height
+    thumbxSizes   <- Thumb widths
     maxthumbxSize <- Maximum thumb width
+    thumbySizes   <- Thumb heights
     maxthumbySize <- Maximum thumb height
+
+    highDPIImages     <- Set to true when @2x high DPI versions of images are available
+    highDPIThumbs     <- Set to true when @2x high DPI versions of thumbs are available
 
     disableRightClick <- Set to true to disable right click on images
     slideshowDelay    <- Delay (in miliseconds) for the slideshows
@@ -64,9 +69,33 @@ var slideshowRunning = false;
 // In a move?
 var movingImages = false;
 
+// *****************************************************************************
+// High DPI handling
+// *****************************************************************************
+
+function isHighDPI() {
+    return (window.devicePixelRatio > 1);
+}
+
+function highDPIFileName(name, highDPIEnabled) {
+    if (highDPIEnabled && isHighDPI()) {
+        name = name.replace(".jpg", "@2x.jpg");
+    }
+    return name;
+}
+
+// Determine image file for given image index
+function imageFilespec(imgindex) {
+    return "images/" + highDPIFileName(images[imgindex], highDPIImages);
+}
+
+// Determine image file for given image index
+function thumbFilespec(imgindex) {
+    return "thumbs/" + highDPIFileName(images[imgindex], highDPIThumbs);
+}
 
 // *****************************************************************************
-// Generic functions (size calculation)
+// Body creation
 // *****************************************************************************
 
 // Recreate complete html of body upon resize
@@ -103,7 +132,15 @@ function createBody() {
         if ((i+1 % nrColumns) == 0) {
             htmlCode += "<tr>\n";
         }
-        htmlCode += "<td class=\"thumb\" style=\"background-image: url(thumbs/" + images[i] + ");\"><img src=\"icons/black.png\" alt=\"" + titles[i] + "\" title=\"" + titles[i] + "\" id=\"thumb" + i + "\" class=\"thumb\" style=\"width: " + targetThumb + "px; height: " + targetThumb + "px;\" /></td>\n";
+        var bgSizeSpec = "cover";
+        if (targetThumb > thumbxSizes[i] || targetThumb > thumbySizes[i]) {
+            if (thumbxSizes[i] > thumbySizes[i]) {
+                bgSizeSpec = thumbxSizes[i] + "px auto"
+            } else {
+                bgSizeSpec = "auto " + thumbySizes[i] + "px"
+            }
+        }
+        htmlCode += "<td class=\"thumb\" style=\"background-image: url(" + encodeURI(thumbFilespec(i)).replace("(","%28").replace(")","%29") + "); background-size: " + bgSizeSpec + ";\"><img src=\"icons/black.png\" alt=\"" + titles[i] + "\" title=\"" + titles[i] + "\" id=\"thumb" + i + "\" class=\"thumb\" style=\"width: " + targetThumb + "px; height: " + targetThumb + "px;\" /></td>\n";
         if ((i+1) % nrColumns == 0) {
             htmlCode += "</tr>\n";
         }
@@ -139,20 +176,8 @@ function createBody() {
     $("#fullimagetitle_2").css("width", $(window).width()-2*margin + "px");
 }
 
-// Determine exact size of full image
-var imageFullX = maxxSize;
-var imageFullY = maxySize;
-function imageFullXY(idx) {
-    var xFactor = targetxFull / xSizes[idx];
-    var yFactor = targetyFull / ySizes[idx];
-    var factor = Math.min(1, xFactor, yFactor);
-    imageFullX = Math.floor(factor*xSizes[idx]);
-    imageFullY = Math.floor(factor*ySizes[idx]);
-}
-
-
 // *****************************************************************************
-// Generic functions (thumb hovering)
+// Thumb hovering
 // *****************************************************************************
 
 // Thumb hover on
@@ -244,8 +269,19 @@ $(document).ready(function initKeyPress() {
 
 
 // *****************************************************************************
-// Functions for handling main image
+// Main image handling
 // *****************************************************************************
+
+// Determine exact size of full image
+var imageFullX = maxxSize;
+var imageFullY = maxySize;
+function imageFullXY(idx) {
+    var xFactor = targetxFull / xSizes[idx];
+    var yFactor = targetyFull / ySizes[idx];
+    var factor = Math.min(1, xFactor, yFactor);
+    imageFullX = Math.floor(factor*xSizes[idx]);
+    imageFullY = Math.floor(factor*ySizes[idx]);
+}
 
 // Left Middle Right full image ID (-1, 0, +1)
 function leftMiddleRightID(d) {
@@ -270,7 +306,7 @@ function setFullImage(d) {
     $("#fullimage_" + fullimageID).css("height", imageFullY + "px");
     $("#fullimage_" + fullimageID).attr("title", title[imageIDX]);
     $("#fullimage_" + fullimageID).attr("alt", title[imageIDX]);
-    $("#fullimage_" + fullimageID).attr("src", "images/" + images[imageIDX]);
+    $("#fullimage_" + fullimageID).attr("src", imageFilespec(imageIDX));
     $("#fullimagetitle_" + fullimageID).html("<h1>"+titles[imageIDX]+"</h1><h2>"+subtitles[imageIDX]+"</h2>");
     $("#fullimagetitle_" + fullimageID).css("left", d*$(window).width() + "px");
 }
@@ -295,7 +331,7 @@ function setFullImages() {
     document.getElementById("imageright").title = titles[prevNextImg(1)];
 };
 
-
+// Show the full image
 function showFullImage() {
     if (!fullimageShown) {
         titleShown = false;
@@ -316,7 +352,7 @@ function showFullImage() {
     }
 }
 
-
+// Hide the full image
 function hideFullImage() {
     if (fullimageShown) {
         stopSlideshow();
@@ -458,7 +494,7 @@ function toggleSlideshow(event) {
 
 
 // *****************************************************************************
-// Init images and thumbs
+// Initialisation
 // *****************************************************************************
 
 // Update sizes and display on resize
@@ -493,10 +529,10 @@ $(window).load(function () {
     var imgObj = new Image();
     var preload = function () {
         if (preloadImg < nrImages) {
-            imgObj.src = "thumbs/" + images[preloadImg];
-            imgObj.src = "images/" + images[preloadImg++];
+            imgObj.src = thumbFilespec(preloadImg);
+            imgObj.src = imageFilespec(preloadImg++);
             setTimeout(preload, 100);
         }
     }
-    setTimeout(preload, 1000);
+    setTimeout(preload, 100);
 });

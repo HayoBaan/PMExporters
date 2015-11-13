@@ -31,14 +31,16 @@ class BasicGalleryUI
     create_control(:thumb_max_width_edit,    EditControl,     dlg, :value=>"200", :formatter=>"unsigned")
     create_control(:thumb_max_height_static, Static,          dlg, :label=>"Max. Height:", :align=>"right")
     create_control(:thumb_max_height_edit,   EditControl,     dlg, :value=>"200", :formatter=>"unsigned")
+    create_control(:thumb_highDPI_check,     CheckBox,        dlg, :label=>"Enable High DPI (@2x) thumbnails?")
 
     create_control(:image_group_box,         GroupBox,        dlg, :label=>"Images")
     create_control(:image_max_width_static,  Static,          dlg, :label=>"Max. Width:", :align=>"right")
     create_control(:image_max_width_edit,    EditControl,     dlg, :value=>"800", :formatter=>"unsigned")
     create_control(:image_max_height_static, Static,          dlg, :label=>"Max. Height:", :align=>"right")
     create_control(:image_max_height_edit,   EditControl,     dlg, :value=>"800", :formatter=>"unsigned")
-    create_control(:preserve_exif_check,     CheckBox,        dlg, :label=>"Preserve EXIF")
-    create_control(:preserve_iptc_check,     CheckBox,        dlg, :label=>"Preserve IPTC")
+    create_control(:image_highDPI_check,     CheckBox,        dlg, :label=>"Enable High DPI (@2x) images?")
+    create_control(:preserve_exif_check,     CheckBox,        dlg, :label=>"Preserve EXIF?")
+    create_control(:preserve_iptc_check,     CheckBox,        dlg, :label=>"Preserve IPTC?")
     create_control(:watermark_check,         CheckBox,        dlg, :label=>"")
     create_control(:watermark_btn,           WatermarkButton, dlg, :label=>"Watermark...")
     create_control(:image_title_static,      Static,          dlg, :label=>"Image Title:", :align=>"right")
@@ -104,6 +106,8 @@ class BasicGalleryUI
       c << @thumb_max_height_static.layout(l2+60+5, c.base+1, w1, sh)
       c << @thumb_max_height_edit.layout(l2+60+5+w1+5, c.base, 60, eh)
       c.pad_down(5).mark_base
+      c << @thumb_highDPI_check.layout(l2, c.base, -1, sh)
+      c.pad_down(5).mark_base
       c.mark_base.size_to_base
     end
     
@@ -114,6 +118,8 @@ class BasicGalleryUI
       c << @image_max_width_edit.layout(l2, c.base, 60, eh)
       c << @image_max_height_static.layout(l2+60+5, c.base+1, w1, sh)
       c << @image_max_height_edit.layout(l2+60+5+w1+5, c.base, 60, eh)
+      c.pad_down(5).mark_base
+      c << @image_highDPI_check.layout(l2, c.base, -1, sh)
       c.pad_down(5).mark_base
       c << @preserve_exif_check.layout(l2, c.base, w1+60, eh)
       c << @preserve_iptc_check.layout(l2+60+5+w1+5, c.base, w1+60, eh)
@@ -210,6 +216,8 @@ class BasicGallery
 
     # Content of images.js
     imagesJS = "// Image info
+var highDPIImages = #{spec.image_highDPI};
+var highDPIThumbs = #{spec.thumb_highDPI};
 var disableRightClick = #{spec.disable_rightclick};
 var rightClickMsg = \"#{escapeHTML(@bridge.expand_vars(spec.rightclick_message, 1))}\";
 var slideshowDelay = #{spec.slideshow_delay};
@@ -217,8 +225,8 @@ var nrImages = #{spec.num_images};
 var images = new Array();
 var titles = new Array();
 var subtitles = new Array();
-var xSizes = new Array();
-var ySizes = new Array();
+var xSizes = new Array(); var ySizes = new Array();
+var thumbxSizes = new Array(); var thumbySizes = new Array();
 "
     maxX = 0
     maxY = 0
@@ -227,15 +235,42 @@ var ySizes = new Array();
     num_progress_steps = spec.num_images
     progress_dialog.set_range(1, num_progress_steps)
 
+    # Save original size specs
+    org_thumb_max_width = spec.thumb_max_width
+    org_thumb_max_height = spec.thumb_max_height
+    org_image_max_width = spec.image_max_width
+    org_image_max_height = spec.image_max_height
+
     # Generate html, thumbs & images
     # NOTE: prefer to generate both thumbnail and image together
     # for a given image index, to maximize disk cache hits.
     1.upto(spec.num_images) do |cur_img_idx|
       progress_dialog.message = "Generating site, images and thumbnails... (#{cur_img_idx} of #{spec.num_images})"
+      
       thumb_dimensions[cur_img_idx] = generate_thumb(spec, cur_img_idx)
+      if (spec.thumb_highDPI)
+        spec.thumb_max_width *= 2
+        spec.thumb_max_height *= 2
+        spec.highDPI = true
+        generate_thumb(spec, cur_img_idx)
+        spec.highDPI = false;
+        spec.thumb_max_width = org_thumb_max_width
+        spec.thumb_max_height = org_thumb_max_height
+      end
+      
       image_dimensions[cur_img_idx] = generate_image(spec, cur_img_idx)
+      if (spec.image_highDPI)
+        spec.image_max_width *= 2
+        spec.image_max_height *= 2
+        spec.highDPI = true
+        generate_image(spec, cur_img_idx)
+        spec.highDPI = false;
+        spec.image_max_width = org_image_max_width
+        spec.image_max_height = org_image_max_height
+      end
 
       image_width, image_height = image_dimensions[cur_img_idx]
+      thumb_width, thumb_height = thumb_dimensions[cur_img_idx]
       title = @bridge.expand_vars(spec.image_title, cur_img_idx);
       title = (spec.image_title_prefix_nr ? "\##{cur_img_idx}" + (title != "" ? " – " : "") : "") + title
       title = escapeHTML(title);
@@ -247,6 +282,7 @@ var ySizes = new Array();
 titles[#{cur_img_idx-1}] = \"#{title}\";
 subtitles[#{cur_img_idx-1}] = \"#{subtitle}\";
 xSizes[#{cur_img_idx-1}] = #{image_width}; ySizes[#{cur_img_idx-1}] = #{image_height};
+thumbxSizes[#{cur_img_idx-1}] = #{thumb_width}; thumbySizes[#{cur_img_idx-1}] = #{thumb_height};
 "
       progress_dialog.increment
     end
@@ -356,11 +392,15 @@ body {
     spec.disable_rightclick = ui.main_rightclick_check.checked?
     spec.rightclick_message = ui.main_rightclick_edit.get_text
 
+    spec.highDPI = false;
+    
     spec.thumb_max_width = ui.thumb_max_width_edit.get_text.to_i
     spec.thumb_max_height = ui.thumb_max_height_edit.get_text.to_i
+    spec.thumb_highDPI = ui.thumb_highDPI_check.checked?
 
     spec.image_max_width = ui.image_max_width_edit.get_text.to_i
     spec.image_max_height = ui.image_max_height_edit.get_text.to_i
+    spec.image_highDPI = ui.image_highDPI_check.checked?
 
     spec.image_preserve_exif = ui.preserve_exif_check.checked?
     spec.image_preserve_iptc = ui.preserve_iptc_check.checked?
@@ -385,6 +425,24 @@ body {
     spec.custom_title_bg_color = ui.custom_title_bg_color.get_color_hex
 
     spec
+  end
+
+  def append_fname_suffix(path_to_file, suffix)
+    fext = File.extname(path_to_file)
+    path_to_file[0..(-(fext.length+1))] + suffix + fext
+  end
+
+  # Overrides default naming scheme
+  def get_image_fname(spec, img_idx)
+    if spec.use_original_filenames
+      fname = @bridge.get_image_filename(img_idx).dup
+      fname << ".jpg" unless fname =~ /\.(jpe|jpg|jpeg)$/i
+    else
+      fname = "IMG_#{img_idx}.jpg"
+    end
+    fname = append_fname_suffix(fname, "@2x") if spec.highDPI
+
+    fname
   end
   
 end
