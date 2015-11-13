@@ -170,6 +170,13 @@ table {
     font-style: italic;
 }
 
+img[src$="left.png"], img[src$="left_.png"], img[src$="left__.png"],
+img[src$="right.png"], img[src$="right_.png"], img[src$="right__.png"],
+img[src$="pause.png"], img[src$="pause__.png"],
+img[src$="play.png"], img[src$="play__.png"] {
+    width: 21px;
+}
+
 @media screen and (max-width: 600px) {
     #fullimagetitle_1, #fullimagetitle_0, #fullimagetitle_2 {
         padding: 10px;
