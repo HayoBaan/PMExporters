@@ -318,9 +318,9 @@ var maxthumbxSize = #{spec.thumb_max_width}; var maxthumbySize = #{spec.thumb_ma
 </div>
 <div id="fullimagebg" onclick="hideFullImage()"></div>
 <div><img id="imageleft" src="icons/left.png" alt="prev" onclick="showPrevNextImg(-1)" /></div>
-<div><img id="fullimage_1" class="copyright" src="icons/empty.png" alt="" onclick="hideFullImage()" /></div>
-<div><img id="fullimage_0" class="copyright" src="icons/empty.png" alt="" onclick="hideFullImage()" /></div>
-<div><img id="fullimage_2" class="copyright" src="icons/empty.png" alt="" onclick="hideFullImage()" /></div>
+<div><img id="fullimage_1" src="icons/empty.png" alt="" onclick="hideFullImage()" /></div>
+<div><img id="fullimage_0" src="icons/empty.png" alt="" onclick="hideFullImage()" /></div>
+<div><img id="fullimage_2" src="icons/empty.png" alt="" onclick="hideFullImage()" /></div>
 <div><img id="imageright" src="icons/right.png" alt="next" onclick="showPrevNextImg(1)" /></div>
 <div><img id="slideshow" src="icons/play.png" alt="play" title="Play slideshow" onclick="toggleSlideshow()" /></div>
 <div id="fullimagetitle_1" onclick="hideFullImage()"></div>

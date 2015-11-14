@@ -69,11 +69,6 @@ table {
     border-radius: 6px;
 }
 
-#mainbody img.thumb {
-    opacity: 0;
-    filter: alpha(opacity=0); /* IE */
-}
-
 #mainbody td {
     background-repeat: no-repeat;
     background-position: center;
@@ -140,6 +135,7 @@ table {
     width: 80px;
     padding: 0;
     vertical-align: bottom;
+    background-size: cover;
 }
 
 #fullimagetitle_1, #fullimagetitle_0, #fullimagetitle_2 {

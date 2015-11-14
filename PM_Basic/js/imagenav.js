@@ -140,7 +140,7 @@ function createBody() {
                 bgSizeSpec = "auto " + thumbySizes[i] + "px"
             }
         }
-        htmlCode += "<td class=\"thumb\" style=\"background-image: url(" + encodeURI(thumbFilespec(i)).replace("(","%28").replace(")","%29") + "); background-size: " + bgSizeSpec + ";\"><img src=\"icons/black.png\" alt=\"" + titles[i] + "\" title=\"" + titles[i] + "\" id=\"thumb" + i + "\" class=\"thumb\" style=\"width: " + targetThumb + "px; height: " + targetThumb + "px;\" /></td>\n";
+        htmlCode += "<td class=\"thumb\" style=\"background-image: url(" + encodeURI(thumbFilespec(i)).replace("(","%28").replace(")","%29") + "); background-size: " + bgSizeSpec + ";\"><img src=\"icons/empty.png\" alt=\"" + titles[i] + "\" title=\"" + titles[i] + "\" id=\"thumb" + i + "\" class=\"thumb\" style=\"width: " + targetThumb + "px; height: " + targetThumb + "px;\" /></td>\n";
         if ((i+1) % nrColumns == 0) {
             htmlCode += "</tr>\n";
         }
@@ -300,15 +300,17 @@ function setFullImage(d) {
     fullimageID = leftMiddleRightID(d);
     imageIDX = prevNextImg(d);
     imageFullXY(imageIDX);
-    $("#fullimage_" + fullimageID).css("left", Math.floor(($(window).width()-imageFullX)/2 + d*$(window).width()) + "px");
+    // Note: the left and right image are both positioned to the left to prevent
+    // being able to "scroll" to the right image on mobile devices
+    $("#fullimage_" + fullimageID).css("left", Math.floor(($(window).width()-imageFullX)/2 + (d == 0 ? 0 : -$(window).width())) + "px");
     $("#fullimage_" + fullimageID).css("bottom", Math.floor(($(window).height()-imageFullY)/2) + "px");
     $("#fullimage_" + fullimageID).css("width", imageFullX + "px");
     $("#fullimage_" + fullimageID).css("height", imageFullY + "px");
     $("#fullimage_" + fullimageID).attr("title", title[imageIDX]);
     $("#fullimage_" + fullimageID).attr("alt", title[imageIDX]);
-    $("#fullimage_" + fullimageID).attr("src", imageFilespec(imageIDX));
+    $("#fullimage_" + fullimageID).css("background-image", "url("  + encodeURI(imageFilespec(imageIDX)).replace("(","%28").replace(")","%29") + ")");
     $("#fullimagetitle_" + fullimageID).html("<h1>"+titles[imageIDX]+"</h1><h2>"+subtitles[imageIDX]+"</h2>");
-    $("#fullimagetitle_" + fullimageID).css("left", d*$(window).width() + "px");
+    $("#fullimagetitle_" + fullimageID).css("left", (d == 0 ? 0 : -$(window).width()) + "px");
 }
 
 // Setup the full image attributes
@@ -398,6 +400,13 @@ function showPrevNextImg(d) {
     
     // Move images
     movingImages = true;
+
+    // First move the "right" image to its proper location
+    imageFullXY(prevNextImg(1));
+    $("#fullimage_" + leftMiddleRightID(1)).css("left", Math.floor(($(window).width()-imageFullX)/2 + $(window).width()) + "px");
+    $("#fullimagetitle_" + leftMiddleRightID(1)).css("left", $(window).width() + "px");
+    
+    // Start animations
     $("#fullimagetitle_" + leftMiddleRightID(-1)).animate({ "left": "-=" + d*$(window).width() },400);
     $("#fullimage_" + leftMiddleRightID(-1)).animate({ "left": "-=" + d*$(window).width() },400);
     $("#fullimagetitle_" + leftMiddleRightID(1)).animate({ "left": "-=" + d*$(window).width() },400);
@@ -511,10 +520,15 @@ $(window).resize(function () {
 $(document).ready(function () {
     resizeBody();
 
-    // Start showing title upon entering image
-    $("#fullimage_1").mouseenter(showTitle);
-    $("#fullimage_0").mouseenter(showTitle);
-    $("#fullimage_2").mouseenter(showTitle);
+    for (var i=0; i<3; i++) {
+        // Start showing title upon entering image
+        $("#fullimage_" + i).mouseenter(showTitle);
+        if (disableRightClick) {
+            // Add no right click/no context menu handler to full images
+            $("#fullimage_" + i).mousedown(noRightClick);
+            $("#fullimage_" + i).contextmenu(noContextMenu);
+        }
+    }
 
     // Create the body
     createBody();
