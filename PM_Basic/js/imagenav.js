@@ -70,8 +70,21 @@ var slideshowRunning = false;
 var movingImages = false;
 
 // *****************************************************************************
-// High DPI handling
+// File handling
 // *****************************************************************************
+
+var imgObj = new Image(); // Dummy object used to load images
+
+// Load an image, calling the callback after the image has been fully loaded
+function loadImage(file, callback) {
+    imgObj.src = file;
+    if (!imgObj.complete) {
+        // Wait 0.1 seconds beforing trying again
+        setTimeout(function () { loadImage(file, callback) }, 100);
+    } else {
+        callback();
+    }
+}
 
 function isHighDPI() {
     return (window.devicePixelRatio > 1);
@@ -89,9 +102,14 @@ function imageFilespec(imgindex) {
     return "images/" + highDPIFileName(images[imgindex], highDPIImages);
 }
 
-// Determine image file for given image index
+// Determine thumb file for given image index
 function thumbFilespec(imgindex) {
     return "thumbs/" + highDPIFileName(images[imgindex], highDPIThumbs);
+}
+
+// Return the file as url(file) string
+function urlFromFile(file) {
+    return "url(" +  encodeURI(file).replace("(","%28").replace(")","%29") + ")";
 }
 
 // *****************************************************************************
@@ -140,7 +158,7 @@ function createBody() {
                 bgSizeSpec = "auto " + thumbySizes[i] + "px"
             }
         }
-        htmlCode += "<td class=\"thumb\" style=\"background-image: url(" + encodeURI(thumbFilespec(i)).replace("(","%28").replace(")","%29") + "); background-size: " + bgSizeSpec + ";\"><img src=\"icons/empty.png\" alt=\"" + titles[i] + "\" title=\"" + titles[i] + "\" id=\"thumb" + i + "\" class=\"thumb\" style=\"width: " + targetThumb + "px; height: " + targetThumb + "px;\" /></td>\n";
+        htmlCode += "<td class=\"thumb\" style=\"background-image: " + urlFromFile(thumbFilespec(i)) + "; background-size: " + bgSizeSpec + ";\"><img src=\"icons/empty.png\" alt=\"" + titles[i] + "\" title=\"" + titles[i] + "\" id=\"thumb" + i + "\" class=\"thumb\" style=\"width: " + targetThumb + "px; height: " + targetThumb + "px;\" /></td>\n";
         if ((i+1) % nrColumns == 0) {
             htmlCode += "</tr>\n";
         }
@@ -308,7 +326,7 @@ function setFullImage(d) {
     $("#fullimage_" + fullimageID).css("height", imageFullY + "px");
     $("#fullimage_" + fullimageID).attr("title", title[imageIDX]);
     $("#fullimage_" + fullimageID).attr("alt", title[imageIDX]);
-    $("#fullimage_" + fullimageID).css("background-image", "url("  + encodeURI(imageFilespec(imageIDX)).replace("(","%28").replace(")","%29") + ")");
+    $("#fullimage_" + fullimageID).css("background-image", urlFromFile(imageFilespec(imageIDX)));
     $("#fullimagetitle_" + fullimageID).html("<h1>"+titles[imageIDX]+"</h1><h2>"+subtitles[imageIDX]+"</h2>");
     $("#fullimagetitle_" + fullimageID).css("left", (d == 0 ? 0 : -$(window).width()) + "px");
 }
@@ -342,15 +360,17 @@ function showFullImage() {
         } else {
             curimage = parseInt(this.id.replace("thumb", ""));
         }
-        setFullImages();
-        showTitle(undefined,600);
-        $("#fullimagebg").fadeIn(600);
-        $("#fullimage_1").fadeIn(600);
-        $("#fullimage_0").fadeIn(600);
-        $("#fullimage_2").fadeIn(600);
-        $("#imageleft").fadeIn(600);
-        $("#imageright").fadeIn(600);
-        fullimageShown = true;
+        loadImage(imageFilespec(prevNextImg(0)), function () {
+            setFullImages();
+            fullimageShown = true;
+            showTitle(undefined,600);
+            $("#fullimagebg").fadeIn(600);
+            $("#fullimage_1").fadeIn(600);
+            $("#fullimage_0").fadeIn(600);
+            $("#fullimage_2").fadeIn(600);
+            $("#imageleft").fadeIn(600);
+            $("#imageright").fadeIn(600);
+        });
     }
 }
 
@@ -401,26 +421,29 @@ function showPrevNextImg(d) {
     // Move images
     movingImages = true;
 
-    // First move the "right" image to its proper location
-    imageFullXY(prevNextImg(1));
-    $("#fullimage_" + leftMiddleRightID(1)).css("left", Math.floor(($(window).width()-imageFullX)/2 + $(window).width()) + "px");
-    $("#fullimagetitle_" + leftMiddleRightID(1)).css("left", $(window).width() + "px");
+    // Load the next image and move into place when fully loaded
+    loadImage(imageFilespec(prevNextImg(lastnextprev)), function () {
+        // First move the "right" image to its proper location
+        imageFullXY(prevNextImg(1));
+        $("#fullimage_" + leftMiddleRightID(1)).css("left", Math.floor(($(window).width()-imageFullX)/2 + $(window).width()) + "px");
+        $("#fullimagetitle_" + leftMiddleRightID(1)).css("left", $(window).width() + "px");
     
-    // Start animations
-    $("#fullimagetitle_" + leftMiddleRightID(-1)).animate({ "left": "-=" + d*$(window).width() },400);
-    $("#fullimage_" + leftMiddleRightID(-1)).animate({ "left": "-=" + d*$(window).width() },400);
-    $("#fullimagetitle_" + leftMiddleRightID(1)).animate({ "left": "-=" + d*$(window).width() },400);
-    $("#fullimage_" + leftMiddleRightID(1)).animate({ "left": "-=" + d*$(window).width() },400);
-    $("#fullimagetitle_" + leftMiddleRightID(0)).animate({ "left": "-=" + d*$(window).width() },400);
-    $("#fullimage_" + leftMiddleRightID(0)).animate({ "left": "-=" + d*$(window).width() },400, function() {
-        // Set new current image
-        curimage = prevNextImg(lastnextprev);
-        middleID = leftMiddleRightID(lastnextprev);
-        // Update images
-        setFullImages();
-        // Show title
-        showTitle(undefined,150);
-        movingImages = false;
+        // Start animations
+        $("#fullimagetitle_" + leftMiddleRightID(-1)).animate({ "left": "-=" + d*$(window).width() },400);
+        $("#fullimage_" + leftMiddleRightID(-1)).animate({ "left": "-=" + d*$(window).width() },400);
+        $("#fullimagetitle_" + leftMiddleRightID(1)).animate({ "left": "-=" + d*$(window).width() },400);
+        $("#fullimage_" + leftMiddleRightID(1)).animate({ "left": "-=" + d*$(window).width() },400);
+        $("#fullimagetitle_" + leftMiddleRightID(0)).animate({ "left": "-=" + d*$(window).width() },400);
+        $("#fullimage_" + leftMiddleRightID(0)).animate({ "left": "-=" + d*$(window).width() },400, function() {
+            // Set new current image
+            curimage = prevNextImg(lastnextprev);
+            middleID = leftMiddleRightID(lastnextprev);
+            // Update images
+            setFullImages();
+            // Show title
+            showTitle(undefined,150);
+            movingImages = false;
+        });
     });
 }
 
@@ -436,12 +459,20 @@ function showTitle(event, fadetime) {
         fadetime = 150;
     }
     clearTimeout(titleTimerId); // Cancel any existing timeout
-    $("#fullimagetitle_" + middleID).fadeIn(fadetime, function () {
-        $("#fullimagetitle_" + middleID).css("opacity", 0.70); // Callback for IE
-        clearTimeout(titleTimerId); // Make sure no other timeout was set in between
-        titleTimerId = setTimeout(hideTitle, 2000);
-        titleShown = true;
-    });
+    if (fullimageShown) {
+        $("#fullimagetitle_" + leftMiddleRightID(-1)).fadeIn(fadetime, function () {
+            $("#fullimagetitle_" + leftMiddleRightID(-1)).css("opacity", 0.70); // Callback for IE
+        });
+        $("#fullimagetitle_" + leftMiddleRightID(1)).fadeIn(fadetime, function () {
+            $("#fullimagetitle_" + leftMiddleRightID(1)).css("opacity", 0.70); // Callback for IE
+        });
+        $("#fullimagetitle_" + leftMiddleRightID(0)).fadeIn(fadetime, function () {
+            $("#fullimagetitle_" + leftMiddleRightID(0)).css("opacity", 0.70); // Callback for IE
+            clearTimeout(titleTimerId); // Make sure no other timeout was set in between
+            titleTimerId = setTimeout(hideTitle, 2000);
+            titleShown = true;
+        });
+    }
 }
 
 
@@ -532,21 +563,4 @@ $(document).ready(function () {
 
     // Create the body
     createBody();
-});
-
-// Initialise on load
-var preloadImg = 0;
-$(window).load(function () {
-    resizeBody();
-
-    // Preload thumbs and images (delayed)
-    var imgObj = new Image();
-    var preload = function () {
-        if (preloadImg < nrImages) {
-            imgObj.src = thumbFilespec(preloadImg);
-            imgObj.src = imageFilespec(preloadImg++);
-            setTimeout(preload, 100);
-        }
-    }
-    setTimeout(preload, 100);
 });
