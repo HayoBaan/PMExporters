@@ -18,13 +18,13 @@ class BasicGalleryUI
 
   def create_controls(parent_dlg)
     dlg = parent_dlg
-    
+
     create_control(:main_group_box,          GroupBox,        dlg, :label=>"PM Basic Gallery")
     create_control(:main_title_static,       Static,          dlg, :label=>"Page Title:", :align=>"right")
     create_control(:main_title_edit,         EditControl,     dlg, :value=>"{folder}", :multiline=>true)
     create_control(:main_rightclick_check,   CheckBox,        dlg, :label=>"Disable Right Click", :checked=>true)
     create_control(:main_rightclick_static,  Static,          dlg, :label=>"Message:", :align=>"right");
-    create_control(:main_rightclick_edit,    EditControl,     dlg, :value=>"© Please contact the author if you want to make use of the image.", :multiline=>true)    
+    create_control(:main_rightclick_edit,    EditControl,     dlg, :value=>"© Please contact the author if you want to make use of the image.", :multiline=>true)
 
     create_control(:thumb_group_box,         GroupBox,        dlg, :label=>"Thumbnails")
     create_control(:thumb_max_width_static,  Static,          dlg, :label=>"Max. Width:", :align=>"right")
@@ -73,7 +73,7 @@ class BasicGalleryUI
     create_control(:custom_title_fg_color,    ColorButton,     dlg, :value=>"ffffff")
     create_control(:custom_title_bg_static,   Static,          dlg, :label=>"Title Background:", :align=>"right")
     create_control(:custom_title_bg_color,    ColorButton,     dlg, :value=>"222222")
-    
+
   end
 
   def layout_controls(container)
@@ -110,7 +110,7 @@ class BasicGalleryUI
       c.pad_down(5).mark_base
       c.mark_base.size_to_base
     end
-    
+
     container.pad_down(5).mark_base
     container.layout_with_contents(@image_group_box, 0, container.base, -1, -1) do |c|
       c.set_prev_right_pad(5).inset(5,25,-5,-5).mark_base
@@ -125,7 +125,7 @@ class BasicGalleryUI
       c << @preserve_iptc_check.layout(l2+60+5+w1+5, c.base, w1+60, eh)
       c.pad_down(5).mark_base
       c << @watermark_check.layout(l2, c.base, 16, eh)
-      c << @watermark_btn.layout(c.prev_right, c.base, 100, eh)      
+      c << @watermark_btn.layout(c.prev_right, c.base, 100, eh)
       c.pad_down(10).mark_base
       c << @image_title_static.layout(0, c.base+1, w1, sh)
       c << @image_title_edit.layout(l2, c.base, -1, eh)
@@ -174,7 +174,7 @@ class BasicGalleryUI
       c.mark_base.size_to_base
     end
 
-    container.pad_down(5).mark_base     
+    container.pad_down(5).mark_base
   end
 
 end
@@ -189,7 +189,7 @@ class BasicGallery
   def self.template_display_name  # template name shown in dialog list box
     "PM Basic Gallery"
   end
-  
+
   def self.template_description  # shown in dialog box
     "Creates a basic website gallery for the selected images."
   end
@@ -246,7 +246,7 @@ var thumbxSizes = new Array(); var thumbySizes = new Array();
     # for a given image index, to maximize disk cache hits.
     1.upto(spec.num_images) do |cur_img_idx|
       progress_dialog.message = "Generating site, images and thumbnails... (#{cur_img_idx} of #{spec.num_images})"
-      
+
       thumb_dimensions[cur_img_idx] = generate_thumb(spec, cur_img_idx)
       if (spec.thumb_highDPI)
         spec.thumb_max_width *= 2
@@ -257,7 +257,7 @@ var thumbxSizes = new Array(); var thumbySizes = new Array();
         spec.thumb_max_width = org_thumb_max_width
         spec.thumb_max_height = org_thumb_max_height
       end
-      
+
       image_dimensions[cur_img_idx] = generate_image(spec, cur_img_idx)
       if (spec.image_highDPI)
         spec.image_max_width *= 2
@@ -357,7 +357,7 @@ body {
     color: ##{spec.custom_title_fg_color};
 }|
     @bridge.template_dest_write_file("css/custom.css", customCSS)
-    
+
   end
 
   def preflight_settings(global_spec)
@@ -373,7 +373,7 @@ body {
   def layout_controls(container)
     @ui.layout_controls(container)
   end
-  
+
   def destroy_controls
     @ui = nil
   end
@@ -393,7 +393,7 @@ body {
     spec.rightclick_message = ui.main_rightclick_edit.get_text
 
     spec.highDPI = false;
-    
+
     spec.thumb_max_width = ui.thumb_max_width_edit.get_text.to_i
     spec.thumb_max_height = ui.thumb_max_height_edit.get_text.to_i
     spec.thumb_highDPI = ui.thumb_highDPI_check.checked?
@@ -444,5 +444,5 @@ body {
 
     fname
   end
-  
+
 end

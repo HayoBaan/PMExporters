@@ -17,11 +17,11 @@ class WebSiteUpdateUI
 
   def create_controls(parent_dlg)
     dlg = parent_dlg
-    
+
     create_control(:type_group_box,          GroupBox,        dlg, :label=>"UpdateWeb")
     create_control(:type_static,             Static,          dlg, :label=>"Update type:", :align=>"right")
     create_control(:type_edit,               EditControl,     dlg, :value=>"Enter update type description")
-    
+
     create_control(:thumb_group_box,         GroupBox,        dlg, :label=>"Thumbnails")
     create_control(:thumb_check,             CheckBox,        dlg, :label=>"Generate thumbnails?", :checked=>true)
     create_control(:thumb_max_width_static,  Static,          dlg, :label=>"Max. Width:", :align=>"right")
@@ -74,7 +74,7 @@ class WebSiteUpdateUI
       c.pad_down(5).mark_base
       c.mark_base.size_to_base
     end
-    
+
     container.pad_down(5).mark_base
     container.layout_with_contents(@image_group_box, 0, container.base, -1, -1) do |c|
       c.set_prev_right_pad(5).inset(5,25,-5,-5).mark_base
@@ -96,7 +96,7 @@ class WebSiteUpdateUI
       c.mark_base.size_to_base
     end
 
-    container.pad_down(5).mark_base     
+    container.pad_down(5).mark_base
   end
 
 end
@@ -111,7 +111,7 @@ class WebSiteUpdate
   def self.template_display_name  # template name shown in dialog list box
     "UpdateWeb"
   end
-  
+
   def self.template_description  # shown in dialog box
     "Creates images and thumbnails for use on e.g., a website."
   end
@@ -124,7 +124,7 @@ class WebSiteUpdate
   def generate_site(global_spec, progress_dialog)
     raise "generate_site called with no @ui instantiated" unless @ui
     spec = build_template_spec(global_spec, @ui)
-    
+
     @bridge.template_dest_mkdir("images")
     @bridge.template_dest_mkdir("thumbs")
 
@@ -196,7 +196,7 @@ class WebSiteUpdate
   def layout_controls(container)
     @ui.layout_controls(container)
   end
-  
+
   def destroy_controls
     @ui = nil
   end
