@@ -301,7 +301,7 @@ var maxthumbxSize = #{spec.thumb_max_width}; var maxthumbySize = #{spec.thumb_ma
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
   <meta http-equiv="imagetoolbar" content="no" />
   <title>#{escapeHTML(@bridge.expand_vars(spec.main_title, 1))}</title>
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="js/resizebody.js"></script>
   <script type="text/javascript" src="js/norightclick.js"></script>
   <script type="text/javascript" src="js/navhover.js"></script>
